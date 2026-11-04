@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google Tag Manager -->
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+  })(window,document,'script','dataLayer','GTM-PLM73FC4');</script>
+  <!-- End Google Tag Manager -->
+  <!-- Zeffy purchase -> GTM (purchase_stape). Fires ONLY when the URL has ?purchase=zeffy
+       (post-checkout redirect). Plain visits (hotel link sent by email) never fire. Do not remove. -->
+  <script>
+  (function () {
+    try {
+      var qs = new URLSearchParams(window.location.search);
+      if ((qs.get('purchase') || '').toLowerCase() !== 'zeffy') return;
+
+      function pick(names) {
+        for (var i = 0; i < names.length; i++) {
+          var v = qs.get(names[i]);
+          if (v !== null && String(v).trim() !== '') return String(v).trim();
+        }
+        return '';
+      }
+      function num(v) {
+        if (v === '') return NaN;
+        var n = parseFloat(String(v).replace(/[^0-9.\-]/g, ''));
+        return isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : NaN;
+      }
+
+      var DEFAULT_VALUE = 545;
+      var orderId = pick(['order_id', 'transaction_id', 'orderId', 'id']);
+      var value = num(pick(['value', 'amount', 'total']));
+      if (isNaN(value)) value = DEFAULT_VALUE;
+      var currency = (pick(['currency']) || 'USD').toUpperCase().slice(0, 3);
+      var ticket = pick(['ticket', 'ticket_type', 'item']) || 'ATHENA 2027 Ticket';
+      var qty = parseInt(pick(['qty', 'quantity']), 10);
+      if (!(qty > 0)) qty = 1;
+      var email = pick(['email']).toLowerCase();
+      var firstName = pick(['first_name', 'firstname']);
+      var lastName = pick(['last_name', 'lastname']);
+
+      var generated = !orderId;
+      if (generated) orderId = 'zeffy-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
+
+      // Lock: same order never fires twice (reload, back button, shared link).
+      var lockKey = generated ? 'athena_zeffy_noid:' + window.location.search : 'athena_zeffy_order:' + orderId;
+      var store = null;
+      try { store = generated ? window.sessionStorage : window.localStorage; } catch (e) { store = null; }
+      try { if (store && store.getItem(lockKey)) { cleanUrl(); return; } } catch (e) {}
+
+      var payload = {
+        event: 'purchase_stape',
+        ecommerce: {
+          transaction_id: orderId,
+          value: value,
+          currency: currency,
+          items: [{
+            item_id: ticket.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+            item_name: ticket,
+            price: Math.round((value / qty) * 100) / 100,
+            quantity: qty
+          }]
+        }
+      };
+      if (email || firstName || lastName) {
+        payload.user_data = {};
+        if (email) payload.user_data.email = email;
+        if (firstName) payload.user_data.first_name = firstName;
+        if (lastName) payload.user_data.last_name = lastName;
+      }
+
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({ ecommerce: null, user_data: null });
+      window.dataLayer.push(payload);
+
+      try { if (store) store.setItem(lockKey, String(Date.now())); } catch (e) {}
+      cleanUrl();
+    } catch (err) {}
+
+    function cleanUrl() {
+      try {
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+        }
+      } catch (e) {}
+    }
+  })();
+  </script>
+  <title>ATHENA 2027 Conference Hotel</title>
+  <meta name="description" content="Book your room at the Hilton Los Angeles/Universal City, the ATHENA 2027 Conference hotel, at the ATHENA block rate of $239 + tax per night, January 25 to February 2, 2027.">
+  <link rel="canonical" href="https://conference.athenainternational.org/thanks-athena/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="ATHENA International">
+  <meta name="author" content="ATHENA Foundation">
+  <meta property="article:author" content="ATHENA Foundation">
+  <meta property="article:publisher" content="https://www.athenainternational.org/">
+  <meta name="publish_date" property="og:publish_date" content="2026-10-28T00:00:00-07:00">
+  <meta property="article:published_time" content="2026-10-28T00:00:00-07:00">
+  <meta property="article:modified_time" content="2026-10-28T00:00:00-07:00">
+  <meta property="og:updated_time" content="2026-10-28T00:00:00-07:00">
+  <meta property="og:url" content="https://conference.athenainternational.org/thanks-athena/">
+  <meta property="og:title" content="ATHENA 2027 Conference Hotel">
+  <meta property="og:description" content="Book your room at the Hilton Los Angeles/Universal City, the ATHENA 2027 Conference hotel, at the ATHENA block rate of $239 + tax per night, January 25 to February 2, 2027.">
+  <meta property="og:image" content="https://conference.athenainternational.org/assets/conference-2027/og/athena-2027-share-hotel.jpg?v=1">
+  <meta property="og:image:secure_url" content="https://conference.athenainternational.org/assets/conference-2027/og/athena-2027-share-hotel.jpg?v=1">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:width" content="2500">
+  <meta property="og:image:height" content="1309">
+  <meta property="og:image:alt" content="The Universal globe fountain with palm trees and the Hilton Los Angeles/Universal City tower behind it">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ATHENA 2027 Conference Hotel">
+  <meta name="twitter:description" content="Book your room at the Hilton Los Angeles/Universal City, the ATHENA 2027 Conference hotel, at the ATHENA block rate of $239 + tax per night, January 25 to February 2, 2027.">
+  <meta name="twitter:image" content="https://conference.athenainternational.org/assets/conference-2027/og/athena-2027-share-hotel.jpg?v=1">
+  <meta name="twitter:image:alt" content="The Universal globe fountain with palm trees and the Hilton Los Angeles/Universal City tower behind it">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-one@5.0.0/400.css');
+    @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-one@5.0.0/600.css');
+    @import url('https://cdn.jsdelivr.net/npm/@fontsource/open-sauce-one@5.0.0/700.css');
+
+    /* Paleta ATHENA: 5 cores do brandbook + extensões de acessibilidade (ver CLAUDE.md do cliente).
+       Mesmo sistema da landing C: bronze de texto nos botões e rótulos, sand nos fundos, sem laranja. */
+    :root {
+      --navy: #0C2E40;
+      --navy-950: #001624;
+      --gold: #A4853E;
+      --bronze-text: #836A31;
+      --bronze-dark: #674E0D;
+      --cream: #FEFFF8;
+      --cream-text: #DAE0DC;
+      --tint: #F8F7EE;
+      --tint-2: #F5F4EA;
+      --ink: #0C2E40;
+      --muted: #3B5768;
+      --line: rgba(12, 46, 64, 0.12);
+      --line-dark: rgba(254, 255, 248, 0.16);
+      --font-display: "Source Serif 4", "Source Serif Pro", Georgia, serif;
+      --font-heading: "Poppins", system-ui, sans-serif;
+      --font-body: "Open Sauce One", "Poppins", system-ui, sans-serif;
+      --font-label: "Poppins", system-ui, sans-serif;
+      --wrap: 1200px;
+      --gutter: 24px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--cream);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; }
+    .wrap { max-width: calc(var(--wrap) + var(--gutter) * 2); margin: 0 auto; padding: 0 var(--gutter); }
+
+    /* tipografia */
+    .eyebrow {
+      display: block;
+      font-family: var(--font-label);
+      font-size: 13px;
+      line-height: 20px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--bronze-text);
+      margin-bottom: 14px;
+    }
+    .on-dark .eyebrow { color: var(--cream-text); }
+    h1, .display-caps {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.01em;
+      line-height: 1.1;
+      color: #fff;
+    }
+    h1 { font-size: clamp(2rem, 4.4vw, 3.4rem); }
+    .band {
+      background: linear-gradient(transparent 56%, var(--gold) 56%, var(--gold) 94%, transparent 94%);
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+      padding: 0 0.08em;
+    }
+    h2 {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(1.8rem, 3.4vw, 2.5rem);
+      line-height: 1.15;
+      color: var(--ink);
+      text-wrap: balance;
+    }
+    .rule { width: 54px; height: 3px; background: var(--gold); margin-top: 18px; }
+    .lead { font-size: 1.08rem; color: var(--muted); max-width: 60ch; margin-top: 18px; }
+
+    /* botões */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 15px 28px;
+      border: 1px solid transparent;
+      border-radius: 2px;
+      font-family: var(--font-label);
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: background-color .2s, border-color .2s, color .2s, transform .2s;
+      white-space: nowrap;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--bronze-text); border-color: var(--bronze-text); color: #fff; }
+    .btn-primary:hover { background: var(--bronze-dark); border-color: var(--bronze-dark); }
+    .btn-light { background: #fff; border-color: #fff; color: var(--bronze-text); }
+    .btn-light:hover { background: var(--tint-2); border-color: var(--tint-2); color: var(--bronze-dark); }
+    .btn-ghost { background: transparent; border-color: rgba(254, 255, 248, 0.5); color: #fff; }
+    .btn-ghost:hover { border-color: #fff; }
+    .btn-line { background: transparent; border-color: var(--bronze-text); color: var(--bronze-text); }
+    .btn-line:hover { background: var(--tint-2); color: var(--bronze-dark); border-color: var(--bronze-dark); }
+    :focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+    /* nav */
+    .site-nav { background: var(--navy); border-bottom: 1px solid var(--line-dark); position: relative; z-index: 5; }
+    .site-nav .wrap { height: 82px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .site-nav .brand img { height: 58px; width: auto; }
+    .nav-link {
+      color: var(--cream);
+      font-family: var(--font-label);
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      text-decoration: none;
+      white-space: nowrap;
+      padding-bottom: 3px;
+      border-bottom: 1px solid transparent;
+    }
+    .nav-link:hover { border-bottom-color: var(--gold); }
+
+    /* hero: foto aparente à direita, azul só atrás do texto */
+    .hero {
+      position: relative;
+      color: #fff;
+      background:
+        linear-gradient(90deg, rgba(12, 46, 64, 0.94) 0%, rgba(12, 46, 64, 0.82) 38%, rgba(12, 46, 64, 0.28) 72%, rgba(12, 46, 64, 0.12) 100%),
+        url("https://athenaintlmedia.blob.core.windows.net/images/conference-2027/fotos/Athena-2027-Conference-Hilton-Universal-City.png") 62% 72% / cover no-repeat;
+      padding: clamp(48px, 6vw, 80px) 0;
+      display: flex;
+      align-items: center;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 120px;
+      background: linear-gradient(transparent, rgba(12, 46, 64, 0.35));
+      pointer-events: none;
+    }
+    .hero .wrap { position: relative; z-index: 1; width: 100%; }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr); gap: 56px; align-items: end; }
+    .confirm {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-label);
+      font-size: 13px;
+      line-height: 20px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cream-text);
+      margin-bottom: 22px;
+    }
+    .confirm i {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: inline-grid;
+      place-items: center;
+      flex: none;
+    }
+    .confirm i::before {
+      content: "";
+      width: 9px; height: 5px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: translateY(-1px) rotate(-45deg);
+    }
+    .hero-sub { margin-top: 22px; max-width: 54ch; font-size: 1.1rem; line-height: 1.6; color: var(--cream); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .hero-meta {
+      margin-top: 22px;
+      font-family: var(--font-label);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cream-text);
+    }
+
+    .rate {
+      background: rgba(0, 22, 36, 0.72);
+      border: 1px solid var(--line-dark);
+      border-top: 3px solid var(--gold);
+      border-radius: 4px;
+      padding: 28px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .rate .eyebrow { margin-bottom: 12px; }
+    .rate-price { display: flex; align-items: baseline; gap: 10px; }
+    .rate-price strong {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(3rem, 5vw, 4rem);
+      line-height: 1;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .rate-price span { font-family: var(--font-heading); font-weight: 600; color: var(--cream); }
+    .rate-note { margin-top: 8px; font-size: 0.92rem; color: var(--cream-text); }
+    .rate dl { margin-top: 22px; border-top: 1px solid var(--line-dark); }
+    .rate dl div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line-dark); }
+    .rate dt { font-size: 0.92rem; color: var(--cream-text); }
+    .rate dd { font-family: var(--font-label); font-weight: 600; font-size: 0.95rem; color: #fff; text-align: right; }
+    .rate dd a { text-decoration: none; }
+    .rate dd a:hover { text-decoration: underline; }
+
+    /* selo de prazo: mesmo componente da landing C (.hotel-badge) */
+    :root { --orange: #FF8200; }
+    .deadline {
+      display: inline-block;
+      font-style: normal;
+      background: var(--orange);
+      color: var(--navy);
+      font-family: var(--font-label);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      line-height: 1.4;
+      padding: 6px 12px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .rate .deadline { margin-bottom: 16px; }
+    .kicker { display: flex; align-items: center; justify-content: space-between; gap: 8px 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .kicker .eyebrow { margin-bottom: 0; }
+    .sticky-cta small.deadline-text { color: var(--orange); font-weight: 700; }
+
+    /* faixa bronze, mesmo padrão do When/Where/Who da landing */
+    .strip { background: var(--gold); color: var(--navy); padding: 26px 0; }
+    .strip .wrap { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 24px; }
+    .strip div { text-align: center; }
+    .strip small {
+      display: block;
+      font-family: var(--font-label);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .strip b { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; line-height: 1.3; }
+    .strip a { text-decoration: none; }
+    .strip a:hover { text-decoration: underline; }
+
+    section.band-cream, section.band-tint { padding: clamp(52px, 6vw, 80px) 0; }
+    .band-cream { background: var(--cream); }
+    .band-tint { background: var(--tint); }
+
+    ul.tri { list-style: none; margin-top: 28px; display: grid; gap: 14px; }
+    ul.tri li { position: relative; padding-left: 26px; font-size: 1.04rem; color: var(--ink); }
+    ul.tri li::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0.5em;
+      width: 10px; height: 9px;
+      background: var(--gold);
+      clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    }
+
+    /* como reservar: passos à esquerda, as duas formas de reservar num card só à direita */
+    .book-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 5vw, 72px); align-items: center; }
+    .steps { list-style: none; margin-top: 24px; }
+    .steps li { display: grid; grid-template-columns: 44px 1fr; align-items: baseline; padding: 12px 0; border-top: 1px solid var(--line); }
+    .steps li:last-child { border-bottom: 1px solid var(--line); }
+    .step-n { font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; line-height: 1; color: var(--gold); }
+    .steps p { font-size: 1rem; color: var(--ink); }
+    .book-card { background: var(--navy); color: #fff; border-top: 3px solid var(--gold); border-radius: 4px; padding: clamp(24px, 3vw, 32px); }
+    .book-card h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.4rem; line-height: 1.2; color: #fff; }
+    .book-card p { margin-top: 6px; color: var(--cream-text); font-size: 0.95rem; }
+    .book-card .btn { margin-top: 18px; }
+    .book-phone { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line-dark); display: grid; grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 8px 16px; }
+    .book-phone small { display: block; font-family: var(--font-label); font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cream-text); }
+    .book-phone b { display: block; margin-top: 2px; font-family: var(--font-label); font-weight: 600; font-size: 0.95rem; color: #fff; }
+    .book-phone a { text-decoration: none; }
+    .book-phone a:hover { text-decoration: underline; }
+
+    /* galeria do hotel: grade editorial, mesmas cinco fotos */
+    .gallery-head { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: 24px 56px; align-items: end; }
+    .gallery-head .lead { margin-top: 14px; }
+    .travel { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+    .travel div { padding: 14px 16px 0 0; }
+    .travel div + div { padding-left: 16px; border-left: 1px solid var(--line); }
+    .travel b { display: block; font-family: var(--font-display); font-weight: 600; font-size: 1.5rem; line-height: 1.1; color: var(--ink); }
+    .travel span { display: block; margin-top: 4px; font-size: 0.9rem; color: var(--muted); }
+    .gallery {
+      margin-top: 32px;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      height: clamp(340px, 32vw, 440px);
+    }
+    .gallery figure { position: relative; overflow: hidden; border-radius: 4px; background: var(--tint-2); }
+    .gallery figure:first-child { grid-row: span 2; }
+    .gallery img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+    .gallery figure:hover img { transform: scale(1.03); }
+    .gallery figcaption {
+      position: absolute;
+      left: 12px; bottom: 12px;
+      background: rgba(0, 22, 36, 0.78);
+      color: #fff;
+      font-family: var(--font-label);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: 2px;
+    }
+
+    /* CTA final */
+    .final {
+      position: relative;
+      color: #fff;
+      background:
+        linear-gradient(90deg, rgba(12, 46, 64, 0.94) 0%, rgba(12, 46, 64, 0.8) 46%, rgba(12, 46, 64, 0.55) 100%),
+        url("https://athenaintlmedia.blob.core.windows.net/images/conference-2027/fotos/hotel-preview-exterior-fountain.jpg") center center / cover no-repeat;
+      padding: clamp(56px, 6vw, 88px) 0;
+    }
+    .final-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: clamp(40px, 6vw, 80px); align-items: center; }
+    .final .display-caps { font-size: clamp(2.2rem, 4.6vw, 3.4rem); }
+    .final .lead { color: var(--cream); }
+    .final .hero-actions { margin-top: 32px; }
+    .final-panel {
+      background: rgba(0, 22, 36, 0.72);
+      border: 1px solid var(--line-dark);
+      border-top: 3px solid var(--gold);
+      border-radius: 4px;
+      padding: 32px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .final-panel ul.tri li { color: var(--cream); font-size: 0.98rem; }
+    .final-panel ul.tri strong { color: #fff; }
+    .final-panel ul.tri { margin-top: 4px; }
+    .qr { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line-dark); display: flex; gap: 20px; align-items: center; }
+    .qr-frame { background: #fff; padding: 8px; border-radius: 4px; flex: none; }
+    .qr-frame img { width: 112px; height: 112px; }
+    .qr h3 { font-family: var(--font-heading); font-weight: 600; font-size: 1rem; color: #fff; }
+    .qr p { margin-top: 4px; font-size: 0.92rem; color: var(--cream-text); }
+
+    /* rodapé, mesmo da landing */
+    footer { background: var(--navy); color: rgba(254, 255, 248, 0.62); padding: 48px 0 32px; font-size: 0.84rem; }
+    .footer-top { display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; }
+    .footer-brand { display: flex; align-items: center; gap: 18px; }
+    .footer-brand img { height: 48px; width: auto; }
+    .footer-tagline { font-family: var(--font-display); font-style: italic; color: var(--cream-text); font-size: 1rem; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+    .footer-links a {
+      font-family: var(--font-label);
+      font-size: 0.78rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(254, 255, 248, 0.72);
+      text-decoration: none;
+      padding-bottom: 3px;
+      border-bottom: 1px solid transparent;
+    }
+    .footer-links a:hover { color: #fff; border-bottom-color: var(--gold); }
+    .footer-legal { margin-top: 32px; padding-top: 22px; border-top: 1px solid var(--line-dark); display: grid; gap: 6px; color: rgba(254, 255, 248, 0.6); }
+
+    /* CTA fixo no celular */
+    .sticky-cta {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      background: var(--navy);
+      border-top: 1px solid var(--line-dark);
+      transform: translateY(110%);
+      transition: transform .3s ease;
+    }
+    .sticky-cta.show { transform: none; }
+    .sticky-cta b { display: block; font-family: var(--font-display); font-size: 1.15rem; color: #fff; line-height: 1.2; }
+    .sticky-cta small { display: block; font-size: 0.8rem; color: var(--cream-text); }
+    .sticky-cta .btn { padding: 12px 18px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .btn, .gallery img, .sticky-cta { transition: none; }
+      .btn:hover { transform: none; }
+    }
+
+    @media (max-width: 1080px) {
+      :root { --gutter: 20px; }
+      .hero-grid, .final-grid, .gallery-head, .book-grid { grid-template-columns: 1fr; }
+      .hero-grid { gap: 40px; }
+      .rate { max-width: 420px; }
+      .hero {
+        background:
+          linear-gradient(180deg, rgba(12, 46, 64, 0.9) 0%, rgba(12, 46, 64, 0.78) 60%, rgba(12, 46, 64, 0.6) 100%),
+          url("https://athenaintlmedia.blob.core.windows.net/images/conference-2027/fotos/Athena-2027-Conference-Hilton-Universal-City.png") 62% 72% / cover no-repeat;
+        min-height: 0;
+      }
+      .strip .wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .site-nav .wrap { height: 64px; }
+      .site-nav .brand img { height: 44px; }
+      .nav-link { font-size: 12px; }
+      h1 { font-size: clamp(1.5rem, 7.6vw, 2.2rem); }
+      .gallery { grid-template-columns: 1fr 1fr; grid-template-rows: none; grid-auto-rows: 150px; height: auto; }
+      .gallery figure:first-child { grid-column: span 2; grid-row: span 2; }
+      .sticky-cta { display: flex; }
+      body { padding-bottom: 76px; }
+      .hero-actions .btn { flex: 1 1 auto; }
+      .qr { display: none; }
+    }
+
+    @media (max-width: 420px) {
+      .strip .wrap { grid-template-columns: 1fr 1fr; gap: 16px 12px; }
+      .strip b { font-size: 1.05rem; }
+      .book-phone { grid-template-columns: 1fr 1fr; justify-content: stretch; }
+      .book-phone div:nth-child(2) { grid-column: span 2; order: 3; }
+      .travel b { font-size: 1.1rem; white-space: nowrap; }
+    }
+
+    @media print {
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .site-nav, .sticky-cta, .hero-actions, .final .hero-actions { display: none !important; }
+      .hero, .final { min-height: 0; padding: 0.4in 0; }
+      section.band-cream, section.band-tint { padding: 0.35in 0; }
+      .gallery { height: 3.2in; }
+      .book-grid, .gallery, .final-grid { break-inside: avoid; }
+      body { padding-bottom: 0; }
+    }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PLM73FC4"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <nav class="site-nav" aria-label="ATHENA 2027 Conference">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="ATHENA 2027 Conference home">
+        <img src="/assets/conference-2027/index-B-assets/brandbook/A-Logo-White.svg" alt="ATHENA International" width="72" height="36">
+      </a>
+      <a class="nav-link" href="/">Conference home</a>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero on-dark" id="top">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div>
+            <p class="confirm"><i aria-hidden="true"></i>You're registered. Next step: your room.</p>
+            <h1>Book your room<br> <span class="band">and extend your stay</span></h1>
+            <p class="hero-sub">Stay where it happens. A limited ATHENA room block is available at the Hilton Los Angeles/Universal City, for the conference and the nights around it. Book by December 31, 2026, to secure the ATHENA block rate.</p>
+            <div class="hero-actions">
+              <a class="btn btn-primary" href="https://www.hilton.com/en/attend-my-event/buruchf-athena-72510575-bbcd-4e84-95b9-32eb2535313/">Book online</a>
+              <a class="btn btn-light" href="#booking">How to book</a>
+            </div>
+            <p class="hero-meta">Program: Thu, Jan 28, 1:00 PM to Sat, Jan 30, 1:00 PM PT</p>
+          </div>
+
+          <aside class="rate" aria-label="ATHENA group rate">
+            <em class="deadline">Book by December 31, 2026</em>
+            <span class="eyebrow">ATHENA block group rate</span>
+            <div class="rate-price"><strong>$239</strong><span>+ tax per night</span></div>
+            <p class="rate-note">Same rate from January 25 to February 2, 2027. Arrive early or stay late.</p>
+          </aside>
+        </div>
+      </div>
+    </header>
+
+    <div class="strip" aria-label="Booking details">
+      <div class="wrap">
+        <div><small>Conference</small><b>January 28-30, 2027</b></div>
+        <div><small>Stay dates</small><b>January 25 to February 2</b></div>
+        <div><small>Group code</small><b>ATHENA</b></div>
+        <div><small>Reservations</small><b><a href="tel:+18186231434">818-623-1434</a></b></div>
+      </div>
+    </div>
+
+
+    <section class="band-cream" id="booking">
+      <div class="wrap book-grid">
+        <div>
+          <span class="eyebrow">How to book</span>
+          <h2>Book in under 2 minutes</h2>
+          <ol class="steps">
+            <li><span class="step-n">01</span><p>Open online booking or call reservations.</p></li>
+            <li><span class="step-n">02</span><p>Pick your dates, anywhere from January 25 to February 2.</p></li>
+            <li><span class="step-n">03</span><p>Complete booking and keep your confirmation.</p></li>
+          </ol>
+        </div>
+        <article class="book-card on-dark">
+          <p class="kicker"><span class="eyebrow">Recommended</span><em class="deadline">Book by December 31, 2026</em></p>
+          <h3>Online reservation</h3>
+          <p>The fastest option. Opens the official Hilton ATHENA International group booking page.</p>
+          <a class="btn btn-primary" href="https://www.hilton.com/en/attend-my-event/buruchf-athena-72510575-bbcd-4e84-95b9-32eb2535313/">Book now</a>
+          <div class="book-phone" aria-label="Phone reservation">
+            <div><small>Prefer to call?</small><b><a href="tel:+18186231434">818-623-1434</a></b></div>
+            <div><small>Hours</small><b>7:00 AM to 7:00 PM daily</b></div>
+            <div><small>Group code</small><b>ATHENA</b></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="band-tint" id="hotel-preview">
+      <div class="wrap">
+        <div class="gallery-head">
+          <div>
+            <span class="eyebrow">In the heart of Universal City, CA</span>
+            <h2>See the property you are booking</h2>
+            <div class="rule"></div>
+            <p class="lead">Steps from Universal Studios Hollywood and CityWalk, where most ATHENA Networking Dinner Pods gather each evening.</p>
+          </div>
+          <div class="travel" aria-label="Travel times">
+            <div><b>15 min</b><span>Burbank Airport</span></div>
+            <div><b>15 min</b><span>Van Nuys Airport (private)</span></div>
+            <div><b>35-45 min</b><span>LAX</span></div>
+          </div>
+        </div>
+        <div class="gallery">
+          <figure>
+            <img src="https://athenaintlmedia.blob.core.windows.net/images/conference-2027/fotos/hotel-preview-lobby-lounge.jpg" alt="Hilton Los Angeles/Universal City lobby lounge" loading="lazy">
+            <figcaption>Lobby lounge</figcaption>
+          </figure>
+          <figure>
+            <img src="https://athenaintlmedia.blob.core.windows.net/images/conference-2027/fotos/hotel-preview-outdoor-pool.jpg" alt="Hilton Los Angeles/Universal City outdoor pool" loading="lazy">
+            <figcaption>Outdoor pool</figcaption>
+          </figure>
+          <figure>
+            <img src="https://athenaintlmedia.blob.core.windows.net/images/conference-2027/fotos/hotel-preview-club-patio.jpg" alt="Hilton Los Angeles/Universal City club patio" loading="lazy">
+            <figcaption>Club patio</figcaption>
+          </figure>
+          <figure>
+            <img src="https://athenaintlmedia.blob.core.windows.net/images/conference-2027/fotos/hotel-preview-cafe-sierra.jpg" alt="Cafe Sierra dining area at Hilton Los Angeles/Universal City" loading="lazy">
+            <figcaption>Cafe Sierra</figcaption>
+          </figure>
+          <figure>
+            <img src="https://athenaintlmedia.blob.core.windows.net/images/conference-2027/fotos/hotel-preview-pool-deck.jpg" alt="Hilton Los Angeles/Universal City pool deck" loading="lazy">
+            <figcaption>Pool deck</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="final on-dark" id="reserve-now">
+      <div class="wrap final-grid">
+        <div>
+          <span class="eyebrow">Reserve now</span>
+          <h2 class="display-caps">Book now and <span class="band">celebrate</span></h2>
+          <p class="lead">Reserve while the ATHENA block rate is available, keep your stay inside the conference hotel, and remove one more variable before January 2027.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="https://www.hilton.com/en/attend-my-event/buruchf-athena-72510575-bbcd-4e84-95b9-32eb2535313/">Book online</a>
+            <a class="btn btn-ghost" href="tel:+18186231434">Call 818-623-1434</a>
+          </div>
+        </div>
+        <aside class="final-panel">
+          <p class="kicker"><span class="eyebrow">Why do it now</span><em class="deadline">Book by December 31, 2026</em></p>
+          <ul class="tri">
+            <li>The ATHENA block rate is limited and can close when inventory fills.</li>
+            <li>January is peak season in Los Angeles. Waiting increases price risk and reduces date flexibility.</li>
+            <li>ATHENA is committed to 200 room nights. <strong>Your reservation directly supports ATHENA.</strong></li>
+          </ul>
+          <div class="qr">
+            <div class="qr-frame">
+              <img src="https://quickchart.io/qr?text=https%3A%2F%2Fwww.hilton.com%2Fen%2Fattend-my-event%2Fburuchf-athena-72510575-bbcd-4e84-95b9-32eb2535313%2F&size=220" alt="QR code for the ATHENA block group booking page" width="112" height="112" loading="lazy">
+            </div>
+            <div>
+              <h3>Prefer booking from your phone?</h3>
+              <p>Scan the code to open the ATHENA block group booking page.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <a href="https://www.athenainternational.org/" aria-label="ATHENA International home"><img src="/assets/conference-2027/index-B-assets/brandbook/A-Logo-White.svg" alt="ATHENA International" width="72" height="36"></a>
+          <p class="footer-tagline">Ignite. Amplify. Celebrate.</p>
+        </div>
+        <nav class="footer-links" aria-label="ATHENA links">
+          <a href="https://www.instagram.com/athena_international/">Instagram</a>
+          <a href="https://www.linkedin.com/company/athena-international/">LinkedIn</a>
+          <a href="https://www.facebook.com/ATHENAInternational">Facebook</a>
+          <a href="https://www.athenainternational.org/terms-and-conditions">Terms &amp; Conditions</a>
+        </nav>
+      </div>
+      <div class="footer-legal">
+        <p>ATHENA International, legally incorporated as the ATHENA Foundation, is a federally recognized 501(c)(3) nonprofit organization. EIN: 38-2717362. Contributions are tax-deductible to the extent permitted by law.</p>
+        <p>Mailing address: 2425 E. Grand River Ave Ste. 1, Lansing, MI 48912</p>
+        <p>&copy; 2026-2027 ATHENA International. All rights reserved. We respect your privacy.</p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="sticky-cta" id="stickyCta" aria-hidden="true">
+    <div><b>$239 + tax / night</b><small class="deadline-text">Book by December 31, 2026</small></div>
+    <a class="btn btn-primary" href="https://www.hilton.com/en/attend-my-event/buruchf-athena-72510575-bbcd-4e84-95b9-32eb2535313/" tabindex="-1">Book now</a>
+  </div>
+  <script>
+  (function () {
+    var bar = document.getElementById('stickyCta');
+    var hero = document.getElementById('top');
+    var final = document.getElementById('reserve-now');
+    if (!bar || !hero || !('IntersectionObserver' in window)) return;
+    var heroIn = true, finalIn = false;
+    function sync() {
+      var on = !heroIn && !finalIn;
+      bar.classList.toggle('show', on);
+      bar.setAttribute('aria-hidden', on ? 'false' : 'true');
+      bar.querySelector('a').tabIndex = on ? 0 : -1;
+    }
+    new IntersectionObserver(function (e) { heroIn = e[0].isIntersecting; sync(); }).observe(hero);
+    if (final) new IntersectionObserver(function (e) { finalIn = e[0].isIntersecting; sync(); }).observe(final);
+  })();
+  </script>
+</body>
+</html>
