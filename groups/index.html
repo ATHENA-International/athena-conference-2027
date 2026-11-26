@@ -14,13 +14,16 @@
           script.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-PLM73FC4';
           document.head.appendChild(script);
         };
+        var loaded = false;
+        var events = ['pointerdown', 'keydown', 'touchstart', 'scroll'];
         var delayedLoad = function () {
+          if (loaded) return;
+          loaded = true;
+          events.forEach(function (e) { window.removeEventListener(e, delayedLoad); });
           loadGtm();
-          window.removeEventListener('pointerdown', delayedLoad);
-          window.removeEventListener('keydown', delayedLoad);
         };
-        window.addEventListener('pointerdown', delayedLoad, { once: true, passive: true });
-        window.addEventListener('keydown', delayedLoad, { once: true });
+        events.forEach(function (e) { window.addEventListener(e, delayedLoad, { once: true, passive: true }); });
+        setTimeout(delayedLoad, 1500);
       });
     </script>
     <!-- End Google Tag Manager -->
